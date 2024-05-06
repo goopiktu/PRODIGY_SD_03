@@ -13,7 +13,23 @@ window = Tk()
 window.geometry("550x400") 
 window.title("Contact Manager")
 
+main_frame = Frame(window)
+main_frame.grid(row=0, column=0, sticky="nsew")
+window.grid_rowconfigure(0, weight=1)
+window.grid_columnconfigure(0, weight=1)
 
+canvas = Canvas(main_frame, width=525, height=350)
+canvas.grid(row=0, column=0, sticky="nsew")
+
+scrollbar = Scrollbar(main_frame, orient=VERTICAL, command=canvas.yview)
+scrollbar.grid(row=0, column=6, sticky='ns')
+
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion= canvas.bbox("all")))
+
+second_frame = Frame(canvas)
+
+canvas.create_window((0,0), window=second_frame, anchor="nw")
 
 def formLabels(form):
     nameTag = Label(form, text="Name")
@@ -105,11 +121,11 @@ edit_buttons = []
 
 # Populate table with data
 def colLabels():
-    name_label = Label(text="Name")
+    name_label = Label(second_frame, text="Name")
     name_label.grid(row=0, column=0)
-    phoneNumber_label = Label(text="Phone Number")
+    phoneNumber_label = Label(second_frame, text="Phone Number")
     phoneNumber_label.grid(row=0, column=1)
-    emailAddress_label = Label(text="Email Address")
+    emailAddress_label = Label(second_frame, text="Email Address")
     emailAddress_label.grid(row=0, column=2)
 
 def populateTable():
@@ -121,30 +137,33 @@ def populateTable():
     name = df['Name'].values
     phone = df['Phone Number'].values
     email = df['Email'].values
-    addButton = Button(window, text="Add", bd="5", command=lambda: addForm())
-
+    addButton = Button(text="Add", bd="5", command=lambda: addForm())
+  
     addButton.place(rely=1.0, relx=1.0, x=-5, y=-5, anchor=SE)
-    for i in range(len(name)):
 
-        name_text = Label(window, width=15, height=2, text=name[i], borderwidth=4, relief="ridge")
+    for i in range(len(name)):
+        name_text = Label(second_frame, width=15, height=2, text=name[i], borderwidth=4, relief="ridge")
         name_text.grid(row=i+1, column=0)
     
-        phone_text = Label(window, width=15, height=2, text=phone[i], borderwidth=4, relief="ridge")
+        phone_text = Label(second_frame, width=15, height=2, text=phone[i], borderwidth=4, relief="ridge")
         phone_text.grid(row=i+1, column=1)
        
-        email_text = Label(window, width=25, height=2, text=email[i], borderwidth=4, relief="ridge")
+        email_text = Label(second_frame, width=25, height=2, text=email[i], borderwidth=4, relief="ridge")
         email_text.grid(row=i+1, column=2)
        
-        delete_button = Button(window, text="Delete", bd="5", command=lambda i=i: deleteMethod(i))
+        delete_button = Button(second_frame, text="Delete", bd="5", command=lambda i=i: deleteMethod(i))
         delete_button.grid(row=i+1, column=3)
         
-        edit_button = Button(window, text="Edit", bd="5", command=lambda i=i: editForm(i))
+        edit_button = Button(second_frame, text="Edit", bd="5", command=lambda i=i: editForm(i))
         edit_button.grid(row=i+1, column=4)
+
+   
+    
         
 
 
 def refreshTable():
-    for widget in window.winfo_children():
+    for widget in second_frame.winfo_children():
         widget.destroy()
     populateTable()
 
